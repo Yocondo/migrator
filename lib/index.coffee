@@ -1,4 +1,3 @@
-config = (require './config').get 'mysql'
 { Promise } = require 'es6-promise'
 fs = require 'fs'
 async = require 'async'
@@ -7,15 +6,14 @@ logPrefix = 'migrator'
 
 module.exports = migrator =
 	logger: console
+	database: null
 	directory: './migrations'
 	tableName: 'schema_migrations'
 
 	migrate: ->
-		logger.info '[%s] migrating database...', logPrefix
-
 		createMigrationTable = ->
 			new Promise (resolve, reject) ->
-				db.query 'select count(*) as cnt from information_schema.tables where lower(table_schema) = lower(?) and lower(table_name) = lower(?)', [ config.database, migrator.tableName ], (err, rows) ->
+				db.query 'select count(*) as cnt from information_schema.tables where lower(table_schema) = lower(?) and lower(table_name) = lower(?)', [ migrator.database, migrator.tableName ], (err, rows) ->
 					return reject err if err
 					return resolve() if rows[0].cnt
 					migrator.logger.info '[%s] creating table %s', logPrefix, migrator.tableName
@@ -61,6 +59,7 @@ module.exports = migrator =
 					return reject err if err
 					resolve migrationIds
 
+		logger.info '[%s] migrating database %s...', logPrefix, migrator.database
 		createMigrationTable()
 		.then collectMigrations
 		.then selectMigrations

@@ -17,7 +17,7 @@ module.exports = migrator =
 					return reject err if err
 					return resolve() if rows[0].cnt
 					migrator.logger.info '[%s] creating table %s', logPrefix, migrator.tableName
-					db.query 'create table #{migrator.tableName} (migration_id varchar(255) not null primary key, executed_at timestamp not null) engine=MyISAM', (err) ->
+					db.query "create table #{migrator.tableName} (migration_id varchar(255) not null primary key, executed_at timestamp not null) engine=MyISAM", (err) ->
 						return reject err if err
 						resolve()
 
@@ -33,7 +33,7 @@ module.exports = migrator =
 		selectMigrations = (migrationIds) ->
 			isApplied = (migrationId) ->
 				new Promise (resolve, reject) ->
-					db.query 'select count(*) cnt from #{migrator.tableName} where migration_id = ?', [ migrationId ], (err, rows) ->
+					db.query "select count(*) cnt from #{migrator.tableName} where migration_id = ?", [ migrationId ], (err, rows) ->
 						return reject err if err
 						resolve rows[0].cnt is 1
 
@@ -51,7 +51,7 @@ module.exports = migrator =
 							db.query statement, next
 						async.series tasks, (err) ->
 							return next err if err
-							db.query 'insert into #{migrator.tableName} set ?', { migration_id: migrationId, executed_at: new Date }, next
+							db.query "insert into #{migrator.tableName} set ?", { migration_id: migrationId, executed_at: new Date }, next
 
 			new Promise (resolve, reject) ->
 				tasks = migrationIds.map executeMigration

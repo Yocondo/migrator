@@ -10,7 +10,7 @@ module.exports = migrator =
 	directory: './migrations'
 	tableName: 'schema_migrations'
 
-	migrate: ->
+	migrate: (db) ->
 		createMigrationTable = ->
 			new Promise (resolve, reject) ->
 				db.query 'select count(*) as cnt from information_schema.tables where lower(table_schema) = lower(?) and lower(table_name) = lower(?)', [ migrator.database, migrator.tableName ], (err, rows) ->

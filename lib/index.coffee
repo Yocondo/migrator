@@ -59,7 +59,7 @@ module.exports = migrator =
 					return reject err if err
 					resolve migrationIds
 
-		logger.info '[%s] migrating database %s...', logPrefix, migrator.database
+		migrator.logger.info '[%s] migrating database %s...', logPrefix, migrator.database
 		createMigrationTable()
 		.then collectMigrations
 		.then selectMigrations
